@@ -1,0 +1,212 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+\usepackage{enumitem}
+\usepackage[french]{babel}
+\usepackage[xindy]{glossaries}
+\frenchbsetup{StandardLists=true}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+
+\title{Plan de Management de Projet}
+\author{Sabine Muzellec, Quentin Roblez, Nathan Rivault, Rémi Eininger}
+\date{Janvier 2020}
+
+\makeglossaries
+\setglossarystyle{listgroup}
+\newglossaryentry{ordonnancement}
+{
+  name={ordonnancement},
+  description={blabla}
+}
+\newglossaryentry{deep learning}
+{
+  name={deep learning},
+  description={blabla}
+}
+\newglossaryentry{machine learning}
+{
+  name={machine learning},
+  description={blabla}
+}
+
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+\subsection{Objet du document}
+Pour réussir sa gestion de projet, il est indispensable de bien comprendre le fondement, les enjeux qui en découlent et les différentes phases de la mise en oeuvre à venir.
+Le rôle de cette réflexion préalable est de répondre à ces objectifs.\\
+Le plan projet représente une véritable carte traçant la route vers l'objectif final et nous permet de nous rendre compte du travail à réaliser.
+Il permet de vérifier que l'ensemble des personnes impliquées dans le projet sont sur la même longueur d'onde.
+
+\subsection{Contexte du projet}
+Le projet est un sujet de recherche mené par l'équipe SEPIA de l'IRIT à l'université Paul Sabatier. Un des chercheurs de cette équipe à fait appel à des étudiants de Master pour compléter le travail ayant déjà été effectué. Etant intéréssée par les enjeux de ce projet, notre équipe, formée de quatre étudiant en M1 IARF, s'est portée volontaire. \\
+Nous avons donc organisé une réunion suite à laquelle nous nous sommes engagés à travailler conjointement dans le cadre de ce projet. De nombreuses ressources nous ont été fournies afin de prendre connaissance du projet dans sa globalité.
+
+\subsection{Descriptif du projet}
+L'objectif est d'utiliser les grandes masses de traces d'exploitation des datacenters de Google et d'Alibaba (plusieurs Go) pour en extraire des informations de comportement des utilisateurs de ces systèmes ainsi que sur le comportement des datacenters. Une deuxième phase consistera à utiliser ces connaissances pour proposer des algorithmes basés sur l'apprentissage (en ligne et/ou hors ligne) pour optimiser l'utilisation des datacenters. Une dernière phase consistera en la validation en environnement de simulation.
+
+\subsection{Méthode de gestion de projet}
+Nous avons choisi de travailler en suivant la méthode Scrum (une méthodologie agile). Ce choix se justifie par :
+\begin{itemize}
+    \item La volonté de mettre en avant notre collaboration avec le "Project Owner". En effet, plus nous privilégions les interactions avec ce dernier, plus nous en apprendrons sur le sujet et pourrons produire des résultats satisfaisants.
+    \item L'importance de produire des algorithmes opérationnels afin de lier étroitement les phases 2 et 3 du projet : chaque modification d'un algorithme devra faire l'objet de tests sans attendre le lancement de la troisième.
+    \item Le délai restreint du projet nous pousse à être réactif et à ne pas prendre de retard. Nous devons donc être le moins possible impacté par le moindre changement pouvant subvenir au cours du déroulement du projet. Nous devrons donc faire preuve d'une grande capacité d'adaptation, que confère la méthode Scrum.
+\end{itemize}
+%\subsection{Nom du projet}
+%\subsection{Sponsor du projet}
+%Présentation du sponsor de projet
+
+\subsection{Chef de projet}
+Nous avons décidé de nommer Sabine Muzellec au rôle de "Scrum Master". Cette dernière est titulaire d'une licence MIAGE - Méthodes informatiques appliquées à la gestion des Entreprise - effectuée en alternance au sein du service informatique d'un grand groupe aux Antilles. Le chef de projet sera donc en charge de la relation avec le client. Il devra également avoir une vision d'ensemble du projet afin de s'assurer de son bon déroulement jusqu'à la cloture.
+\subsection{Membres de l'équipe projet}
+L'équipe de développement sera donc composée de Nathan Rivault et Rémi Eininger, titulaires d'une licence informatique de l'université Paul Sabatier, ainsi que Quentin Roblez possédant un DUT Génie electrique et informatique industriel suivi d'une licence en informatique.\\
+Nous avons attribué à chaque membre un rôle technique. Chaque responsable désigné aura plus de maitrîse dans son domaine que les autres. Cela n'impliquera pas que chacun se restreigne à son rôle. La répartition est la suivante :
+\begin{itemize}
+    \item Nathan Rivault est responsable de l'analyse des données.
+    \item Remi Eininger est responsable du développement des schedulers.
+    \item Quentin Roblez est responsable des différentes recettes.
+\end{itemize}
+Sabine Muzellec aura un rôle transverse permettant de faire le lien entre les travaux de chacun.
+
+\section{Documents de références}
+Beaucoup de documentation nous a été fournie au début de ce projet :
+\begin{itemize}
+    \item Un article écrit par notre client et ses collaborateurs expliquant l'état actuel des recherches effectuées par son équipe [1]
+    \item Un mémoire écrit par étudiant de master de l'université de Cantabrie traitant du même sujet [2]
+    \item Un notebook Jupyter sur lequel nous pouvions consulter le code existant
+    \item Des traces fournies par Google et Alibaba ainsi que leur documentation associée (schéma de données, etc) [3]
+    \item Un environnement de simulation opérationnel accompagné de sa documentation, sur lequel tester nos productions [4]
+    \item Nous nous aiderons également des cours que nous suivons tout au long du semestre pour acquérir de nouvelles connaissances utilisables à la réalisation des différents livrables.
+\end{itemize}
+
+
+\section{Périmètre du projet}
+\subsection{Enjeux et objectifs du projet}
+L'enjeu du projet est l'optimisation de l'\gls{ordonnancement} des tâches dans un centre de données afin de trouver un équilibre entre la consommation d'énergie et les performances temporelles.\\
+L'objectif du projet est donc de comprendre le fonctionnement des algorithmes d'\gls{ordonnancement} existants ainsi que les techniques actuelles relatives à la repartition de tâches. Par la suite, il nous faudra concevoir des solutions répondant aux enjeux en utilisant diverses techniques plus ou moins dynamiques.
+\subsection{Domaines traités}
+Nous utiliserons différents domaines d'application dans le cadre de ce projet. Dans un premier temps, l'environnement de simulation fourni nous permettra de tester et comprendre les algorithmes d'\gls{ordonnancement} (existants et de nos productions).
+De plus, nous pensons utiliser différentes approches des techniques d'intelligence artificielle afin d'optimiser ces techniques d'\gls{ordonnancement} (\gls{deep learning}, \gls{machine learning}, ...).
+\subsection{Domaines exclus}
+Notre travail ne portera pas sur le fonctionnement des serveurs ou des machines utilisées dans les datacenters. Nous nous concentrerons uniquement sur la partie logicielle du projet et non matérielle.
+%\subsection{Intégration}
+%Comment notre travail s'intègre dans l'existant.
+\subsection{Livrables}
+La première partie du projet consiste en une analyse poussée des données (traces) fournies en commencant par celles de Google. Cette analyse à l'établissement de "règles" de gestion et de répartition. \\
+Le second livrable sera le lancement de simulations lancées sur divers algorithmes de répartition afin d'en déduire des conclusions supplémentaires.\\
+Le dernier livrable et l'objectif du projet, est l'élaboration d'un algorithme de répartition appliquant les conclusions faites lors des deux précédentes phases.
+\subsection{Bénéfices attendus}
+Notre principal bénéfice à la réalisation de ce projet est la connaissance et l'expérience que nous gagnerons à travailler avec un chercheur de l'Irit. \\
+Nous espérons également que notre travail méritera une note convenable équivalente au travail fourni.
+\subsection{Contraintes de réalisation}
+\subsubsection{Temporelles}
+Nous n'avons pas de créneaux spécifiques dans notre emploi du temps nous permettant de nous dédier entièrement à la réalisation du projet. Nous devons donc prendre sur notre temps libre. De plus, il nous faut répartir notre temps entre les différents projets que nous menons en parallèle au cours de ce semestre.\\
+La soutenance annoncant la fin du projet est prévu pour le 6 ou 7 mai.
+
+
+\subsubsection{Techniques}
+Le code existant a été écrit en Python. Nous devrons donc utiliser ce même langage pour nos optimisations. \\
+Nous également devons prendre en compte que nos tests s'effectueront sur un simulateur et pas en environnement réél.
+\subsubsection{Humaines}
+Notre Project Owner ne sera présent sur le campus pendant une grande partie du projet. Nous pourrons tout de même correspondre avec lui mais il sera moins disponible que pour la première phase.
+
+%\subsubsection{Administratives}
+%\subsubsection{Légales}
+
+\subsection{Parties Prenantes}
+Le SJQ est Service juridique et qualité. Il est décisionnaire en cas de conflit et a autorité sur le déroulement du projet\\
+Le project owner a autorité sur la finalité du projet et l'évaluation de la qualité des livrables transmis.\\
+Les autres équipes qui noteront notre PMP seront consultés dans le cadre de l'évaluation de notre gestion de projet.\\
+Nous avons choisit de représenter le rôle de chaque partie prenante par une matrice RACI.
+\begin{table}[h]
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|}
+\hline
+                                       & MOE & \begin{tabular}[c]{@{}l@{}}Scrum \\ Master\end{tabular} & \begin{tabular}[c]{@{}l@{}}Data \\ Analyst\end{tabular} & \begin{tabular}[c]{@{}l@{}}Lead \\ developper\end{tabular} & Recetteur & SJQ & \begin{tabular}[c]{@{}l@{}}Project \\ Owner\end{tabular} & \begin{tabular}[c]{@{}l@{}}Autres \\ équipes\end{tabular} \\ \hline
+Communication avec le client           & A   & R                                                       & C                                                       & C                                                          & C         & I   & I                                                        &                                                           \\ \hline
+Telechargement des ressources          & R   & A                                                       &                                                         &                                                            &           &     & C                                                        &                                                           \\ \hline
+Redaction/Mise à jour du PMP           & R   & A                                                       &                                                         &                                                            &           & C   & I                                                        &                                                           \\ \hline
+Notation du PMP                        & R   &                                                         &                                                         &                                                            &           & A   & I                                                        & C                                                         \\ \hline
+Analyse des données                    & R   &                                                         & A                                                       &                                                            &           &     & C                                                        &                                                           \\ \hline
+Analyse des schedulers                 & R   &                                                         &                                                         & A                                                          &           &     & C                                                        &                                                           \\ \hline
+Gestion des ressources et délais       & I   & A                                                       &                                                         &                                                            &           & C   & C                                                        &                                                           \\ \hline
+Analyse du simulateur                  & R   &                                                         &                                                         & A                                                          &           &     & C                                                        &                                                           \\ \hline
+Développement                          & R   &                                                         &                                                         & A                                                          &           &     & C                                                        &                                                           \\ \hline
+Tests                                  & R   &                                                         &                                                         &                                                            & A         &     & C                                                        &                                                           \\ \hline
+Soutenance                             & R   &                                                         &                                                         &                                                            &           & A   & I                                                        &                                                           \\ \hline
+Evaluation de la qualité des livrables & I   &                                                         &                                                         &                                                            &           & C   & A                                                        &                                                           \\ \hline
+\end{tabular}
+\caption{R : Responsable, A : Autorité, C : Consulté, I : Informé}
+\end{table}
+
+\section{Structures du projet}
+\subsection{Work Breakdown Structure}
+Structure de découpage du projet (organigramme des tâches ou décomposition arborescente de l'ensemble des tâches du projet)
+%\subsection{Product Breakdown Structure}
+%Décomposition arborescente du produit ou service
+
+%\section{Responsabilités dans le projet}
+%\subsection{Resource Breakdown Structure}
+%Liste ordonnée des ressources classées par fonction et type
+%\subsection{Organization breakdown structure}
+%Arborescence définissant les responsabilités de chaque intervenant
+
+\section{Planning du projet}
+Nous avons découpé le projet en une liste d'activités ou de jalons, regroupées en sous-groupes :
+\begin{itemize}
+    \item Plan du Management de Projet : rédaction du PMP, mise à jour du PMP
+    \item Management de projet : préparation de la soutenance, passage de la soutenance, deadlines du client
+    \item Analyse des données : téléchargement des traces, prise de connaissance du schéma, déduction de règles
+    \item Développement des schedulers : installation du simulateur, analyse de l'existant, application de l'existant dans l'environnement de simulation, ajout de fonctionnalités, comparaisons
+    \item Phases de recette : test d'intégration, tests fonctionnels, tests de charge, tests de performance
+\end{itemize}
+Le diagramme de Gantt qui en découle est le suivant :
+\begin{center}
+    \includegraphics[scale = 0.35]{gantt.png}
+\end{center}
+
+
+%\section{Evaluation des coûts}
+%Grille de répartition du budget
+
+\section{Gestion de la communication}
+Nos contacts clés sont : notre client et le Service Juridique et Qualité. Un créneau par semaine est reservé à l'UE nous permettant de rencontrer le SJQ si cela s'avère nécessaire. \\De même, nous organisons régulièrement des réunions avec notre client (environ une fois par semaine). De plus, nous envoyons un mail tout les vendredis à notre client afin de l'informer de notre avancée au cours de la semaine.\\
+Nous avons à notre disposition la messagerie étudiante pour contacter le client (et le SJQ). Par la suite, nous utiliserons un outil de visio-conférence pour echanger avec le project owner (ce dernier étant en déplacement).\\
+Entre nous, nous utilisons Discord pour communiquer. Les ressources relatives au projet sont déposées dans un repository GitHub. La redaction du PMP se fait sur Overleaf.
+
+\section{Gestion des risques}
+\subsection{Identification, evaluation et quantification des risques}
+Identification, quantification de la criticité et de la probabilité d'occurence des risques
+\subsection{Plan d'actions}
+Mesures à prendre
+
+\section{Controle du projet}
+\subsection{Reporting}
+Le premier problème auquel nous nous sommes heurtés est d'origine technique. L'un des membres de l'équipe n'a pas réussi à lancer les permières simulations depuis l'outil dédié. Une capture d'écran de l'erreur a été transmise à Mr Da Costa (le project owner) afin que ce dernier apporte une solution pour pallier à ce problème. \\
+De plus, un autre membre de l'équipe s'est retrouvé face à un problème matériel l'empéchant de travailler sur son poste de travail.
+
+%Monitoring et mesures de la performance
+%Comparaison avec les attentes
+%Reporting sur les dérives et problèmes
+%les actions correctives
+\subsection{Gestion du changement}
+Procédures à suivre pour toute modification
+
+%\section{Documents types}
+%Avis de convocation, comptes rendu de réunions, PV d'état d'avancement, etc
+
+%\section{Gestion de la sous-traitance}
+%Entreprises, objectifs, contraintes, etc
+\printglossary
+\section{Annexes}
+
+\begin{enumerate}[label={[}\arabic*{]}]
+    \item Georges Da Costa, Léo Grange, Inès de Courchelle, Modeling, Classifying and Generating large-scale Google-like Workload (2018)
+    \item Adrián Herrera Arcila, Jose Luis Bosque Orero, HDeepRM: Deep Reinforcement Learning   for Workload  Management in Heterogeneous Clusters (2019)
+    \item https://github.com/alibaba/clusterdata\\
+    https://github.com/google/cluster-data
+    \item https://gitlab.inria.fr/batsim/batsim
+\end{enumerate}
+\end{document}
