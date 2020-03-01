@@ -1,0 +1,35 @@
+{
+    "description": "Workload from google data",
+    "date": "02/28/2020, 16:44:03",
+    "nb_res": 128,
+
+    "profiles": {
+        "5000": {
+            "type": "delay",
+            "delay": 10000
+        }
+    },
+    "jobs": [
+        {
+            "id": "1",
+            "profile": "5000",
+            "res": 1,
+            "subtime": 0,
+            "walltime": 20000
+        },
+        {
+            "id": "2",
+            "profile": "5000",
+            "res": 1,
+            "subtime": 1000000,
+            "walltime": 20000
+        },
+        {
+            "id": "3",
+            "profile": "5000",
+            "res": 1,
+            "subtime": 2000000,
+            "walltime": 20000
+        }
+    ]
+}
