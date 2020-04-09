@@ -1,35 +1,70 @@
 {
     "description": "Workload from google data",
     "date": "02/28/2020, 16:44:03",
-    "nb_res": 128,
+    "nb_res": 3,
 
     "profiles": {
-        "5000": {
+        "1000": {
             "type": "delay",
-            "delay": 10000
+            "delay": 1000
         }
     },
     "jobs": [
         {
             "id": "1",
-            "profile": "5000",
+            "profile": "1000",
             "res": 1,
             "subtime": 0,
-            "walltime": 20000
+            "walltime": 2000
+        },
+        {
+            "id": "4",
+            "profile": "1000",
+            "res": 1,
+            "subtime": 0,
+            "walltime": 2000
         },
         {
             "id": "2",
-            "profile": "5000",
+            "profile": "1000",
             "res": 1,
-            "subtime": 1000000,
-            "walltime": 20000
+            "subtime": 100,
+            "walltime": 2000
         },
         {
             "id": "3",
-            "profile": "5000",
+            "profile": "1000",
             "res": 1,
-            "subtime": 2000000,
-            "walltime": 20000
+            "subtime": 200,
+            "walltime": 2000
+        },
+        {
+            "id": "5",
+            "profile": "1000",
+            "res": 1,
+            "subtime": 1300,
+            "walltime": 2000
+        },
+        {
+            "id": "6",
+            "profile": "1000",
+            "res": 1,
+            "subtime": 1300,
+            "walltime": 2000
+        },
+        {
+            "id": "7",
+            "profile": "1000",
+            "res": 1,
+            "subtime": 1400,
+            "walltime": 2000
+        },
+        {
+            "id": "8",
+            "profile": "1000",
+            "res": 1,
+            "subtime": 1500,
+            "walltime": 2000
         }
     ]
 }
