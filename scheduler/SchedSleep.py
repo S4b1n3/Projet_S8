@@ -49,7 +49,17 @@ class SchedSleep(BatsimScheduler):
         self.jobs_waiting = []
 
         self.sched_delay = 0.0
-        self.sleep_wait = 188
+
+        #temps pour que les machines s'eteingnent, 0 = infini
+        self.sleep_wait = 0
+        # pourcentage max de machine en idle
+        self.max_Idle = 0.25
+        #tableau qui stock les requestcall pour éviter de lancer deux requestcall au même timestamp
+        self.requestCall = SortedSet()
+        #est-ce que le workload est fini
+        self.end_Workload = False
+        #tableau qui stock a quel timestamp la machine i doit s'arreter, si pas d'arret programmer la machine i est à -1
+        self.machine_wait = [-1] * self.bs.nb_resources
 
         self.open_jobs = []
 
@@ -63,7 +73,7 @@ class SchedSleep(BatsimScheduler):
             int(i): State.Idle.value for i in range(self.bs.nb_resources)}
         print("machines_states", self.machines_states)
 
-        self.machine_wait = [-1] * self.bs.nb_resources
+
 
         print("machines_waiter", self.machine_wait)
 
@@ -71,14 +81,14 @@ class SchedSleep(BatsimScheduler):
 
 
     def scheduleJobs(self):
-        print('\n\n\n\n')
+        """print('\n\n\n\n')
         print('open_jobs = ', self.open_jobs)
 
         print('computingM = ', self.computing_machines)
         print('idleM = ', self.idle_machines)
         print('sleepingM = ', self.sleeping_machines)
         print('switchingON_M = ', self.switching_ON_machines)
-        print('switchingOFF_M = ', self.switching_OFF_machines)
+        print('switchingOFF_M = ', self.switching_OFF_machines)"""
 
         scheduled_jobs = []
         pstates_to_change = []
@@ -106,18 +116,18 @@ class SchedSleep(BatsimScheduler):
 
             else:  # Job can fit on the machine, but not now
                 loop = False
-                print("############ Job does not fit now ############")
+                #print("############ Job does not fit now ############")
                 nb_not_computing_machines = self.bs.nb_resources - \
                     len(self.computing_machines)
-                print("nb_res_req = ", nb_res_req)
-                print("nb_not_computing_machines = ",
-                      nb_not_computing_machines)
+                #print("nb_res_req = ", nb_res_req)
+                #print("nb_not_computing_machines = ",
+                #      nb_not_computing_machines)
                 if nb_res_req <= nb_not_computing_machines:  # The job could fit if more machines were switched ON
                     # Let us switch some machines ON in order to run the job
                     nb_res_to_switch_ON = nb_res_req - \
                         len(self.idle_machines) - \
                         len(self.switching_ON_machines)
-                    print("nb_res_to_switch_ON = ", nb_res_to_switch_ON)
+                    #print("nb_res_to_switch_ON = ", nb_res_to_switch_ON)
                     if nb_res_to_switch_ON > 0:  # if some machines need to be switched ON now
                         nb_switch_ON = min(
                             nb_res_to_switch_ON, len(self.sleeping_machines))
@@ -132,30 +142,12 @@ class SchedSleep(BatsimScheduler):
                                     (PState.ComputeFast.value, (r, r)))
                 else:  # The job cannot fit now because of other jobs
                     # Let us put all idle machines to sleep
-                    for r in self.idle_machines:
-                        if self.machine_wait[r]<0:
-                            self.machine_wait[r]=round(self.bs.time()) + self.sleep_wait #première demande d'arret, initialisation du temps
-                        elif self.machine_wait[r]<=round(self.bs.time()): #temps d'attente dépassé
-                            self.idle_machines.remove(r)
-                            self.machine_wait[r]=-1
-                            self.switching_OFF_machines.add(r)
-                            self.machines_states[r] = State.SwitchingOFF.value
-                            pstates_to_change.append((PState.Sleep.value, (r, r)))
+                    pstates_to_change = self.SleepMachineControl()
 
 
         # if there is nothing to do, let us put all idle machines to sleep
         if not self.open_jobs:
-            print(self.idle_machines)
-            for r in self.idle_machines:
-                if self.machine_wait[r]<0:
-                    self.machine_wait[r]=round(self.bs.time()) + self.sleep_wait
-                elif self.machine_wait[r]<=round(self.bs.time()):
-                    self.idle_machines.remove(r)
-                    self.machine_wait[r]=-1
-                    self.switching_OFF_machines.add(r)
-                    self.machines_states[r] = State.SwitchingOFF.value
-                    pstates_to_change.append((PState.Sleep.value, (r, r)))
-            #self.idle_machines = SortedSet()
+            pstates_to_change = self.SleepMachineControl()
 
         """
         if not self.open_jobs:
@@ -169,15 +161,17 @@ class SchedSleep(BatsimScheduler):
         # update time
         self.bs.consume_time(self.sched_delay)
 
-        print(self.bs.time())
+        #print(self.bs.time())
 
 
         if max(self.machine_wait)==-1:
             nextSleep=-1
         else:
             nextSleep = min(filter(lambda i: i > 0, self.machine_wait))
-            self.bs.wake_me_up_at(nextSleep)
-            print(self.machine_wait, nextSleep)
+            if not(nextSleep in self.requestCall):
+                self.bs.wake_me_up_at(nextSleep)
+                self.requestCall.add(nextSleep)
+                #print(self.machine_wait, nextSleep)
 
 
 
@@ -186,35 +180,76 @@ class SchedSleep(BatsimScheduler):
         for (val, (r1,r2)) in pstates_to_change:
             self.bs.set_resource_state(ProcSet(r1), val)
 
-    def onRequestedCall(self):
-        pstates_to_change = []
-        print("request call, time:",self.bs.time())
 
-        #print(self.idle_machines)
+    def SleepMachineControl(self):
+        pstates_to_change = []
+
+        nb_idle_machine = len(self.idle_machines)
         for r in self.idle_machines.copy():
-            #print("testcall: ",r,self.machine_wait[r],round(self.bs.time()),self.machine_wait[r]<=round(self.bs.time()))
             if self.machine_wait[r]<0:
-                self.machine_wait[r]=round(self.bs.time()) + self.sleep_wait
-            elif self.machine_wait[r]<=round(self.bs.time()):
+                if (nb_idle_machine > self.bs.nb_resources * self.max_Idle or self.end_Workload):
+                    self.machine_wait[r]=round(self.bs.time())-1 #arret immédiat
+                    nb_idle_machine-=1
+                elif self.sleep_wait !=0:
+                    self.machine_wait[r]=round(self.bs.time()) + self.sleep_wait #arret retardé
+            if self.machine_wait[r]>0 and self.machine_wait[r]<=round(self.bs.time()):
                 self.idle_machines.remove(r)
                 self.machine_wait[r]=-1
                 self.switching_OFF_machines.add(r)
                 self.machines_states[r] = State.SwitchingOFF.value
                 pstates_to_change.append((PState.Sleep.value, (r, r)))
+
+        if not(self.end_Workload):
+            nb_need_switch_on =round(self.bs.nb_resources * self.max_Idle - len(self.idle_machines) - len(self.switching_ON_machines))
+            if nb_need_switch_on > 0:
+                nb_switch_ON = min(
+                    nb_need_switch_on, len(self.sleeping_machines))
+                if nb_switch_ON > 0:  # If some machines can be switched ON now
+                    res = self.sleeping_machines[0:nb_switch_ON]
+                    for r in res:  # Machines' states update + pstate change request
+                        self.sleeping_machines.remove(r)
+                        self.switching_ON_machines.add(r)
+                        self.machines_states[
+                            r] = State.SwitchingON.value
+                        pstates_to_change.append(
+                            (PState.ComputeFast.value, (r, r)))
+
+        return pstates_to_change
+
+    def onNoMoreJobsInWorkloads(self):
+        pstates_to_change = []
+        self.end_Workload = True
+
+        for r in self.idle_machines:
+            self.idle_machines.remove(r)
+            self.machine_wait[r]=-1
+            self.switching_OFF_machines.add(r)
+            self.machines_states[r] = State.SwitchingOFF.value
+            pstates_to_change.append((PState.Sleep.value, (r, r)))
+
+        for (val, (r1,r2)) in pstates_to_change:
+            self.bs.set_resource_state(ProcSet(r1), val)
+
+    def onRequestedCall(self):
+        #print("request call, time:",self.bs.time())
+
         #print(self.idle_machines)
+        pstates_to_change = self.SleepMachineControl()
 
         if max(self.machine_wait)==-1:
             nextSleep=-1
         else:
             nextSleep = min(filter(lambda i: i > 0,      self.machine_wait))
-            self.bs.wake_me_up_at(nextSleep)
-            print(self.machine_wait, nextSleep)
+            if not(nextSleep in self.requestCall):
+                self.bs.wake_me_up_at(nextSleep)
+                self.requestCall.add(nextSleep)
+            #print(self.machine_wait, nextSleep)
 
         for (val, (r1,r2)) in pstates_to_change:
             self.bs.set_resource_state(ProcSet(r1), val)
 
     def onJobSubmission(self, job):
-        print("job:",job)
+        #print("job:",job)
         if job.requested_resources > self.bs.nb_compute_resources:
             self.bs.reject_jobs([job]) # This job requests more resources than the machine has
         else:
@@ -247,7 +282,7 @@ class SchedSleep(BatsimScheduler):
                 sys.exit(
                     "Unhandled case: a machine switched to a sleep pstate but was not switching OFF")
         else:
-            print(new_pstate,PState.Sleep.value, new_pstate==PState.Sleep.value)
+            #print(new_pstate,PState.Sleep.value, new_pstate==PState.Sleep.value)
             sys.exit("Switched to an unhandled pstate: " + str(new_pstate))
 
         self.scheduleJobs()
