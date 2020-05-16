@@ -54,6 +54,8 @@ class SchedSleep(BatsimScheduler):
         self.sleep_wait = 0
         # pourcentage max de machine en idle
         self.max_Idle = 0.25
+        #Rallume des machines si le nombre de machine en idle est inférieur au max
+        self.boot_Idle = True
         #tableau qui stock les requestcall pour éviter de lancer deux requestcall au même timestamp
         self.requestCall = SortedSet()
         #est-ce que le workload est fini
@@ -163,7 +165,8 @@ class SchedSleep(BatsimScheduler):
 
         #print(self.bs.time())
 
-
+        #On récupère le temps du prochain éteignage et si il a pas déjà été programmer
+        #on envoit un message à batsim pour nous reveiller à ce moment la 
         if max(self.machine_wait)==-1:
             nextSleep=-1
         else:
@@ -184,14 +187,21 @@ class SchedSleep(BatsimScheduler):
     def SleepMachineControl(self):
         pstates_to_change = []
 
+        #nombre de machine en idle actuellement
         nb_idle_machine = len(self.idle_machines)
         for r in self.idle_machines.copy():
+            #si la machine n'a pas de temps d'arret programmé
             if self.machine_wait[r]<0:
+                #si le nombre de machine en idle est supérieur au nombre max
+                #ou qu'on est arrivé à la fin du workload
+                #on programme la l'arret de la machine imédiatement
                 if (nb_idle_machine > self.bs.nb_resources * self.max_Idle or self.end_Workload):
                     self.machine_wait[r]=round(self.bs.time())-1 #arret immédiat
                     nb_idle_machine-=1
+                #Sinon si sleep_wait n'est pas égal à 0 on programme l'arret dans sleep_wait
                 elif self.sleep_wait !=0:
                     self.machine_wait[r]=round(self.bs.time()) + self.sleep_wait #arret retardé
+            #Si la machine à un temps d'arret programmé et qu'il est inférrieur au temps actuelle alors on l'eteint
             if self.machine_wait[r]>0 and self.machine_wait[r]<=round(self.bs.time()):
                 self.idle_machines.remove(r)
                 self.machine_wait[r]=-1
@@ -199,14 +209,20 @@ class SchedSleep(BatsimScheduler):
                 self.machines_states[r] = State.SwitchingOFF.value
                 pstates_to_change.append((PState.Sleep.value, (r, r)))
 
-        if not(self.end_Workload):
+
+        #Si le workload est pas fini et qu'on a boot_Idle à vrai
+        if not(self.end_Workload) and self.boot_Idle:
+            #On récupère le nombre de machine qu'on a besoin d'allumé
             nb_need_switch_on =round(self.bs.nb_resources * self.max_Idle - len(self.idle_machines) - len(self.switching_ON_machines))
             if nb_need_switch_on > 0:
+                #on prend le minimun entre le nombre de machine eteinte et ce qu'on a besoin
                 nb_switch_ON = min(
                     nb_need_switch_on, len(self.sleeping_machines))
-                if nb_switch_ON > 0:  # If some machines can be switched ON now
+                #Si on a au moins une machine à allumer
+                if nb_switch_ON > 0:
                     res = self.sleeping_machines[0:nb_switch_ON]
-                    for r in res:  # Machines' states update + pstate change request
+                    #on parcours les machines et on les allume
+                    for r in res:
                         self.sleeping_machines.remove(r)
                         self.switching_ON_machines.add(r)
                         self.machines_states[
